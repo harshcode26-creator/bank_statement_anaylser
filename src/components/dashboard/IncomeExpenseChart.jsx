@@ -20,10 +20,6 @@ export default function IncomeExpenseChart({ monthly }) {
   const [animated, setAnimated] = useState(false)
   const data = monthly
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
-
   const chartData = useMemo(() => {
     return Object.entries(data ?? {})
       .sort(([a], [b]) => a.localeCompare(b))

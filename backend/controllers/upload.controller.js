@@ -63,9 +63,14 @@ const uploadFiles = async (req, res) => {
     const analytics = calculateAnalytics(categorizedTransactions);
     const transactions = categorizedTransactions;
     const totalTransactions = transactions.length;
-    const summary = analytics.summary;
-    const categories = analytics.categories;
-    const monthly = analytics.monthly;
+    
+    const {
+      summary,
+      categories,
+      monthly,
+      topMerchants,
+      insights
+    } = analytics;
 
     const uploadDoc = await Upload.create({
       user: req.user.id,
@@ -74,6 +79,8 @@ const uploadFiles = async (req, res) => {
       summary,
       categories,
       monthly,
+      topMerchants,
+      insights,
     });
 
     const transactionDocs = transactions.map((t) => ({
@@ -94,6 +101,8 @@ const uploadFiles = async (req, res) => {
       summary,
       categories,
       monthly,
+      topMerchants,
+      insights,
       preview: buildPreview(transactions),
       transactions,
     });

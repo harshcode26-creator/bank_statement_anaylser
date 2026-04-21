@@ -131,18 +131,26 @@ export default function CategoryDetails() {
 
   if (isLoading) {
     return (
-      <div className="p-4 sm:p-6 text-slate-400">
-        Loading transactions...
+      <div className="min-h-[400px] w-full flex flex-col items-center justify-center p-6">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-4"></div>
+        <div className="text-slate-400 text-sm font-medium">Loading transactions...</div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="p-4 sm:p-6">
-        <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
-          <h1 className="text-2xl font-semibold text-white">No data available</h1>
-          <p className="text-slate-400 mt-2">{error}</p>
+      <div className="min-h-[400px] w-full flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <div className="text-red-400 mb-4 text-sm font-medium bg-red-400/10 border border-red-400/20 px-4 py-2 rounded-lg">
+            {error}
+          </div>
+          <button
+            className="mt-2 px-6 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-200 hover:opacity-80"
+            onClick={goBack}
+          >
+            Go Back
+          </button>
         </div>
       </div>
     )
@@ -151,7 +159,12 @@ export default function CategoryDetails() {
   return (
     <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
       <div className="flex items-start sm:items-center gap-4">
-        <button onClick={goBack}>&larr;</button>
+        <button
+          onClick={goBack}
+          className="p-2 rounded-lg hover:bg-white/5 transition-all duration-200 hover:opacity-80 text-white"
+        >
+          &larr;
+        </button>
         <div>
           <h1 className="text-2xl font-semibold text-white">
             {categoryTitle}
@@ -182,7 +195,7 @@ export default function CategoryDetails() {
       </div>
 
       <div className="rounded-2xl bg-slate-800 border border-white/10">
-        <div className="px-6 py-4 border-b flex justify-between gap-4">
+        <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center gap-4">
           <h3 className="text-lg font-semibold text-white">
             Transactions
           </h3>
@@ -190,19 +203,19 @@ export default function CategoryDetails() {
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search by merchant or bank"
-            className="rounded-full bg-slate-700 px-4 py-2 text-sm text-white"
+            className="rounded-full bg-slate-700 px-4 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-indigo-400 transition-all duration-200"
           />
         </div>
 
         {!filteredTransactions.length ? (
-          <div className="px-6 py-8 text-sm text-slate-400">
-            No transactions found for this category.
+          <div className="px-6 py-12 text-sm text-slate-400 text-center">
+            No transactions found in this category.
           </div>
         ) : (
           filteredTransactions.map((tx) => (
             <div
               key={tx.id}
-              className="flex justify-between px-6 py-4 border-t border-white/5"
+              className="flex justify-between px-6 py-4 border-t border-white/5 hover:bg-white/5 transition-colors"
             >
               <div>
                 <p className="font-medium text-white">
