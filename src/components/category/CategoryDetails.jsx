@@ -1,11 +1,17 @@
 import CategoryRow from "./CategoryRow.jsx"
 
 export default function CategoryDetails({ categoryEntries = [], onCategorySelect }) {
-  const total = categoryEntries.reduce((sum, category) => sum + category.value, 0)
-  const normalizedCategories = categoryEntries.map((category) => ({
+  const visibleCategories = categoryEntries.filter(
+    (category) => Number(category.value ?? 0) > 0,
+  )
+  const total = visibleCategories.reduce(
+    (sum, category) => sum + Number(category.value ?? 0),
+    0,
+  )
+  const normalizedCategories = visibleCategories.map((category) => ({
     name: category.name,
-    amount: category.value,
-    percent: total ? Math.round((category.value / total) * 100) : 0,
+    amount: Number(category.value ?? 0),
+    percent: total ? Math.round((Number(category.value ?? 0) / total) * 100) : 0,
   }))
 
   return (

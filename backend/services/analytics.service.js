@@ -1,11 +1,27 @@
-const DEFAULT_CATEGORIES = {
-  Food: 0,
-  Travel: 0,
-  Shopping: 0,
-  Bills: 0,
-  Entertainment: 0,
-  Other: 0,
-};
+const CATEGORIES = [
+  "Food",
+  "Travel",
+  "Shopping",
+  "Bills",
+  "Entertainment",
+  "Other",
+];
+const DEFAULT_CATEGORIES = Object.fromEntries(
+  CATEGORIES.map((category) => [category, 0]),
+);
+
+function normalizeCategory(category) {
+  const value = String(category || "").trim();
+
+  if (!value) {
+    return "Other";
+  }
+
+  const normalized =
+    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+
+  return CATEGORIES.includes(normalized) ? normalized : "Other";
+}
 
 function getMonthKey(date) {
   const value = String(date || "").trim();
@@ -36,9 +52,7 @@ function calculateAnalytics(transactions) {
 
   for (const transaction of transactions || []) {
     const amount = Number(transaction.amount) || 0;
-    const category = Object.prototype.hasOwnProperty.call(categories, transaction.category)
-      ? transaction.category
-      : "Other";
+    const category = normalizeCategory(transaction.category);
     const monthKey = getMonthKey(transaction.date);
 
     if (transaction.type === "credit") {

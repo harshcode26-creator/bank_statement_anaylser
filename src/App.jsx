@@ -14,8 +14,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/upload" />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/dashboard" element={<Navigate to="/upload" />} />
         <Route
-          path="/dashboard"
+          path="/dashboard/:id"
           element={
             <DashboardLayout>
               <Dashboard />
@@ -23,7 +24,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/category-breakdown"
+          path="/dashboard/:id/category-breakdown"
           element={
             <DashboardLayout>
               <Category />
@@ -31,7 +32,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/category/:name"
+          path="/dashboard/:id/category/:name"
           element={
             <DashboardLayout>
               <CategoryDetailsPage />
@@ -39,7 +40,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/monthly-summary"
+          path="/dashboard/:id/monthly-summary"
           element={
             <DashboardLayout>
               <Monthly />
@@ -47,7 +48,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/monthly"
+          path="/dashboard/:id/monthly"
           element={
             <DashboardLayout>
               <Monthly />
@@ -55,7 +56,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/history"
+          path="/dashboard/:id/history"
           element={
             <DashboardLayout>
               <History />

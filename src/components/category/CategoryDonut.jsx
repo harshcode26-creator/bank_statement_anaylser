@@ -25,7 +25,9 @@ function CustomTooltip({ active, payload }) {
 }
 
 export default function CategoryDonut({ categoryEntries = [] }) {
-  const chartData = categoryEntries
+  const chartData = categoryEntries.filter(
+    (category) => Number(category.value ?? 0) > 0,
+  )
 
   return (
     <div className="w-[220px] h-[220px] mx-auto">

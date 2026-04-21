@@ -99,7 +99,7 @@ function DashboardNavItem({ to, icon, label, effectiveOpen, onClick }) {
   )
 }
 
-export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data }) {
+export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uploadId }) {
   const navigate = useNavigate()
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
 
@@ -126,12 +126,14 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data
   }
 
   const handleNavClick = (to) => {
-    navigate(to, { state: data })
+    navigate(to)
 
     if (window.innerWidth < 1024) {
       onCloseMobile?.()
     }
   }
+
+  const dashboardPath = uploadId ? `/dashboard/${uploadId}` : "/upload"
 
   return (
     <div
@@ -166,7 +168,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data
 
       <nav className="flex-1 px-3 py-4 space-y-2">
         <DashboardNavItem
-          to="/dashboard"
+          to={dashboardPath}
           icon="dashboard"
           label="Dashboard"
           effectiveOpen={effectiveOpen}
@@ -174,7 +176,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data
         />
 
         <DashboardNavItem
-          to="/dashboard/category-breakdown"
+          to={uploadId ? `/dashboard/${uploadId}/category-breakdown` : "/upload"}
           icon="pie"
           label="Category Breakdown"
           effectiveOpen={effectiveOpen}
@@ -182,7 +184,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data
         />
 
         <DashboardNavItem
-          to="/dashboard/monthly"
+          to={uploadId ? `/dashboard/${uploadId}/monthly` : "/upload"}
           icon="calendar"
           label="Monthly Summary"
           effectiveOpen={effectiveOpen}
@@ -198,7 +200,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, data
         /> */}
 
         <DashboardNavItem
-          to="/dashboard/history"
+          to={uploadId ? `/dashboard/${uploadId}/history` : "/upload"}
           icon="history"
           label="History"
           effectiveOpen={effectiveOpen}

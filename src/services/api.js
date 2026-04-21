@@ -19,3 +19,33 @@ export const uploadFiles = async (files) => {
 
   return res.data;
 };
+
+export const getUploadById = async (id) => {
+  const res = await API.get(`/upload/${id}`);
+
+  return res.data;
+};
+
+export const getUploads = async () => {
+  const res = await API.get("/upload");
+
+  return res.data;
+};
+
+export const getTransactions = async (id, params = {}) => {
+  const res = await API.get(`/upload/${id}/transactions`, { params });
+
+  return res.data;
+};
+
+export const updateUpload = async (id, data) => {
+  const res = await API.patch(`/upload/${id}`, data);
+
+  return res.data;
+};
+
+export const deleteUpload = async (id) => {
+  const res = await API.delete(`/upload/${id}`);
+
+  return res.data;
+};

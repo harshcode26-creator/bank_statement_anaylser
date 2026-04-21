@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import HighLevelSummary from "../components/dashboard/HighLevelSummary.jsx"
 import IncomeExpenseChart from "../components/dashboard/IncomeExpenseChart.jsx"
 import KpiCards from "../components/dashboard/KpiCards.jsx"
+import { getTransactions, getUploadById } from "../services/api.js"
 
 function formatAmount(value) {
   return Number(value ?? 0).toLocaleString("en-IN", {
@@ -12,29 +13,63 @@ function formatAmount(value) {
 }
 
 export default function Dashboard() {
-  const location = useLocation()
   const navigate = useNavigate()
-  const data = location.state
-  const [isReady, setIsReady] = useState(false)
+  const { id } = useParams()
+  const [data, setData] = useState(null)
+  const [transactions, setTransactions] = useState([])
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [loadedId, setLoadedId] = useState(null)
 
   useEffect(() => {
-    console.log(data)
-  }, [data])
+    if (!id) {
+      navigate("/upload")
+      return undefined
+    }
+
+    let isMounted = true
+
+    Promise.all([getUploadById(id), getTransactions(id)])
+      .then(([uploadData, transactionData]) => {
+        if (!isMounted) return
+
+        setData(uploadData)
+        setTransactions(transactionData)
+        setError("")
+      })
+      .catch((fetchError) => {
+        if (!isMounted) return
+
+        console.error(fetchError)
+        setError("Unable to load dashboard data.")
+        setData(null)
+        setTransactions([])
+      })
+      .finally(() => {
+        if (!isMounted) return
+
+        setLoadedId(id)
+        setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [id, navigate])
 
   const summary = data?.summary ?? { income: 0, expense: 0, net: 0 }
   const categories = data?.categories
   const monthly = data?.monthly
-  const preview = data?.preview ?? []
-  const transactions = data?.transactions ?? []
+  const preview = transactions.slice(0, 10)
   const totalTransactions = Number(data?.totalTransactions ?? transactions.length ?? preview.length ?? 0)
 
   const categoryEntries = useMemo(() => {
     return Object.entries(categories ?? {})
+      .filter(([, value]) => Number(value ?? 0) > 0)
       .map(([name, value]) => ({
         name,
         value: Number(value ?? 0),
       }))
-      .filter((item) => item.value > 0)
   }, [categories])
 
   const maxCategoryValue = useMemo(() => {
@@ -42,39 +77,39 @@ export default function Dashboard() {
     return Math.max(...categoryEntries.map((item) => item.value), 1)
   }, [categoryEntries])
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setIsReady(true)
-    }, 250)
-
-    return () => {
-      window.clearTimeout(timer)
-    }
-  }, [])
-
   const startNewUpload = () => {
     navigate("/upload")
   }
 
   const goToCategoryBreakdown = () => {
-    navigate("/dashboard/category-breakdown", { state: data })
+    navigate(`/dashboard/${id}/category-breakdown`)
   }
 
   const goToMonthly = () => {
-    navigate("/dashboard/monthly", { state: data })
+    navigate(`/dashboard/${id}/monthly`)
   }
 
   const goToCategoryDetails = (name) => {
-    navigate(`/dashboard/category/${encodeURIComponent(name)}`, { state: data })
+    navigate(`/dashboard/${id}/category/${encodeURIComponent(name)}`)
   }
 
-  if (!data) {
+  const isLoading = loading || loadedId !== id
+
+  if (isLoading) {
+    return (
+      <div className="min-h-full bg-transparent flex items-center justify-center">
+        <div className="text-slate-400">Loading dashboard...</div>
+      </div>
+    )
+  }
+
+  if (error || !data) {
     return (
       <div className="min-h-full bg-transparent flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-white">No analysis data found</h1>
           <p className="text-slate-400 mt-2">
-            Upload a bank statement to generate your dashboard.
+            {error || "Upload a bank statement to generate your dashboard."}
           </p>
           <button
             className="mt-6 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition"
@@ -89,12 +124,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-full bg-transparent">
-      {!isReady ? (
-        <div className="flex items-center justify-center py-24 text-slate-400">
-          Loading dashboard...
-        </div>
-      ) : (
-        <div>
+      <div>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
@@ -245,8 +275,7 @@ export default function Dashboard() {
               Your data is processed temporarily and discarded.
             </p>
           </section>
-        </div>
-      )}
+      </div>
     </div>
   )
 }

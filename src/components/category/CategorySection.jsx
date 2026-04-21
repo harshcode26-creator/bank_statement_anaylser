@@ -12,6 +12,10 @@ export default function CategorySection({
   type,
   categories = [],
 }) {
+  const visibleCategories = categories.filter(
+    (category) => Number(category.amount ?? category.value ?? 0) > 0,
+  )
+
   return (
     <div className="space-y-4">
       <div
@@ -25,7 +29,7 @@ export default function CategorySection({
         </p>
       </div>
 
-      {categories.map((category) => (
+      {visibleCategories.map((category) => (
         <CategoryRow
           key={category.name}
           name={category.name}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const initialSteps = [
   { key: "upload", label: "Uploading file", status: "loading" },
@@ -16,9 +16,8 @@ function getStepStatus(index, activeIndex, isSuccess) {
 }
 
 export default function Processing() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const data = location.state;
+  const { id } = useParams();
   const [progress, setProgress] = useState(10);
   const [activeStep, setActiveStep] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -29,7 +28,7 @@ export default function Processing() {
   }));
 
   useEffect(() => {
-    if (!data) {
+    if (!id) {
       return undefined;
     }
 
@@ -50,10 +49,10 @@ export default function Processing() {
     return () => {
       window.clearInterval(timer);
     };
-  }, [data, navigate]);
+  }, [id]);
 
   useEffect(() => {
-    if (!data) {
+    if (!id) {
       return undefined;
     }
 
@@ -64,16 +63,16 @@ export default function Processing() {
     }, 1200);
 
     const redirectTimer = window.setTimeout(() => {
-      navigate("/dashboard", { state: data });
+      navigate(`/dashboard/${id}`);
     }, 1500);
 
     return () => {
       window.clearTimeout(successTimer);
       window.clearTimeout(redirectTimer);
     };
-  }, [data, navigate]);
+  }, [id, navigate]);
 
-  if (!data) {
+  if (!id) {
     return (
       <div
         className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0b1220] to-[#020617] px-4"

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
+import { getTransactions } from "../services/api.js"
 
 function InsightCard({ label, value }) {
   return (
@@ -41,39 +42,64 @@ function getCategoryTitle(name) {
 }
 
 export default function CategoryDetails() {
-  const { name } = useParams()
-  const location = useLocation()
+  const { id, name } = useParams()
   const navigate = useNavigate()
-  const data = location.state
   const categoryTitle = getCategoryTitle(name)
   const categoryName = categoryTitle
+  const [transactions, setTransactions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [loadedKey, setLoadedKey] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const requestKey = `${id ?? ""}:${categoryName}`
 
   const goBack = () => {
-    navigate("/dashboard/category-breakdown", { state: data })
+    navigate(`/dashboard/${id}/category-breakdown`)
   }
 
+  useEffect(() => {
+    if (!id) {
+      navigate("/upload")
+      return undefined
+    }
+
+    let isMounted = true
+
+    getTransactions(id, { category: categoryName })
+      .then((transactionData) => {
+        if (!isMounted) return
+
+        setTransactions(transactionData)
+        setError("")
+      })
+      .catch((fetchError) => {
+        if (!isMounted) return
+
+        console.error(fetchError)
+        setError("Unable to load category transactions.")
+        setTransactions([])
+      })
+      .finally(() => {
+        if (!isMounted) return
+
+        setLoadedKey(requestKey)
+        setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [categoryName, id, navigate, requestKey])
+
   const categoryTransactions = useMemo(() => {
-    return (data?.transactions ?? [])
-      .filter(
-        (tx) =>
-          tx.type === "debit" &&
-          tx.category === categoryName,
-      )
-      .map((tx, index) => ({
+    return transactions.map((tx, index) => ({
         id: `${tx.date ?? "unknown"}-${tx.description ?? "transaction"}-${index}`,
         description: tx.description ?? "Unknown transaction",
         date: tx.date ?? "-",
         bank: tx.bank ?? tx.type ?? "-",
         amount: Number(tx.amount ?? 0),
       }))
-  }, [categoryName, data])
-
-  useEffect(() => {
-    console.log(data?.transactions)
-    console.log("Category:", categoryName)
-    console.log("Filtered tx:", categoryTransactions)
-  }, [categoryName, categoryTransactions, data])
+  }, [transactions])
 
   const filteredTransactions = useMemo(() => {
     const query = searchQuery.toLowerCase()
@@ -101,12 +127,22 @@ export default function CategoryDetails() {
     [total, transactionCount],
   )
 
-  if (!data) {
+  const isLoading = loading || loadedKey !== requestKey
+
+  if (isLoading) {
+    return (
+      <div className="p-4 sm:p-6 text-slate-400">
+        Loading transactions...
+      </div>
+    )
+  }
+
+  if (error) {
     return (
       <div className="p-4 sm:p-6">
         <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
           <h1 className="text-2xl font-semibold text-white">No data available</h1>
-          <p className="text-slate-400 mt-2">Please upload again.</p>
+          <p className="text-slate-400 mt-2">{error}</p>
         </div>
       </div>
     )

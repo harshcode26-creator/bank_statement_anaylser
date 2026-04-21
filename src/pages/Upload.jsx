@@ -48,7 +48,7 @@ export default function Upload() {
       const data = await uploadFiles(files)
 
       console.log(data)
-      navigate("/processing", { state: data })
+      navigate(`/dashboard/${data.uploadId}`)
     } catch (error) {
       console.error(error)
       setMessage("Upload failed. Please try again.")

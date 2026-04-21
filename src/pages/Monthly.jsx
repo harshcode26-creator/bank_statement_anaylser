@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { getUploadById } from "../services/api.js"
 
 const format = (num) => new Intl.NumberFormat("en-IN").format(num)
 
@@ -23,17 +24,65 @@ function getMonthlyData(monthly) {
 }
 
 export default function Monthly() {
-  const location = useLocation()
-  const stateData = location.state
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const [stateData, setStateData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [loadedId, setLoadedId] = useState(null)
   const [viewMode, setViewMode] = useState("table")
   const data = useMemo(() => getMonthlyData(stateData?.monthly), [stateData])
 
-  if (!stateData) {
+  useEffect(() => {
+    if (!id) {
+      navigate("/upload")
+      return undefined
+    }
+
+    let isMounted = true
+
+    getUploadById(id)
+      .then((uploadData) => {
+        if (!isMounted) return
+
+        setStateData(uploadData)
+        setError("")
+      })
+      .catch((fetchError) => {
+        if (!isMounted) return
+
+        console.error(fetchError)
+        setError("Unable to load monthly summary.")
+        setStateData(null)
+      })
+      .finally(() => {
+        if (!isMounted) return
+
+        setLoadedId(id)
+        setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [id, navigate])
+
+  const isLoading = loading || loadedId !== id
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen px-4 md:px-10 pt-5 md:pt-8 pb-8 text-slate-400 bg-transparent">
+        Loading monthly summary...
+      </div>
+    )
+  }
+
+  if (error || !stateData) {
     return (
       <div className="min-h-screen px-4 md:px-10 pt-5 md:pt-8 pb-8 text-slate-200 bg-transparent">
         <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
           <h1 className="text-2xl font-semibold text-white">No data available</h1>
-          <p className="text-slate-400 mt-2">Please upload statement.</p>
+          <p className="text-slate-400 mt-2">{error || "Please upload statement."}</p>
         </div>
       </div>
     )

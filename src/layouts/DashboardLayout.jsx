@@ -1,10 +1,9 @@
 import { useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import DashboardSidebar from "../components/dashboard/DashboardSidebar.jsx"
 
 export default function DashboardLayout({ children }) {
-  const location = useLocation()
-  const data = location.state
+  const { id } = useParams()
   const [desktopOpen, setDesktopOpen] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -33,7 +32,7 @@ export default function DashboardLayout({ children }) {
           isOpen={desktopOpen}
           onToggle={toggleDesktop}
           onCloseMobile={closeMobile}
-          data={data}
+          uploadId={id}
         />
       </div>
 

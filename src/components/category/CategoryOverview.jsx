@@ -1,6 +1,10 @@
 import CategoryDonut from "./CategoryDonut.jsx"
 
 export default function CategoryOverview({ categoryEntries = [] }) {
+  const visibleCategories = categoryEntries.filter(
+    (category) => Number(category.value ?? 0) > 0,
+  )
+
   return (
     <div className="flex flex-col items-center space-y-10">
       <div
@@ -12,11 +16,11 @@ export default function CategoryOverview({ categoryEntries = [] }) {
         </h3>
 
         <div className="flex justify-center">
-          <CategoryDonut categoryEntries={categoryEntries} />
+          <CategoryDonut categoryEntries={visibleCategories} />
         </div>
 
         <div className="flex justify-center gap-8 text-sm text-slate-300 mt-6 flex-wrap">
-          {categoryEntries.map((category) => (
+          {visibleCategories.map((category) => (
             <div key={category.name} className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-indigo-500"></span>
               <span>{category.name}</span>

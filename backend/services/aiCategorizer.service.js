@@ -7,14 +7,14 @@ const MODELS = [
   "google/gemma-3-4b:free",
 ];
 const BATCH_SIZE = 10;
-const ALLOWED_CATEGORIES = new Set([
+const CATEGORIES = [
   "Food",
   "Travel",
   "Shopping",
   "Bills",
   "Entertainment",
   "Other",
-]);
+];
 
 function chunkArray(items, size) {
   const chunks = [];
@@ -27,22 +27,30 @@ function chunkArray(items, size) {
 }
 
 function buildPrompt(descriptions) {
-  return `Classify each transaction into one of these categories: Food, Travel, Shopping, Bills, Entertainment, Other.
+  const numberedDescriptions = descriptions
+    .map((description, index) => `${index + 1}. ${description}`)
+    .join("\n");
 
-Return ONLY JSON array.
+  return `Classify each transaction into exactly one of these categories: ${CATEGORIES.join(", ")}.
+
+Return ONLY a JSON array of exactly ${descriptions.length} category strings in the same order.
+Do not include explanations, markdown, or categories outside the allowed list.
 
 Transactions:
-${descriptions.join("\n")}`;
+${numberedDescriptions}`;
 }
 
 function normalizeCategory(category) {
   const value = String(category || "").trim();
 
-  if (value.toLowerCase() === "others") {
+  if (!value) {
     return "Other";
   }
 
-  return ALLOWED_CATEGORIES.has(value) ? value : "Other";
+  const normalized =
+    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+
+  return CATEGORIES.includes(normalized) ? normalized : "Other";
 }
 
 function parseAICategories(text, expectedLength) {
@@ -50,13 +58,11 @@ function parseAICategories(text, expectedLength) {
     const jsonMatch = String(text || "").match(/\[[\s\S]*\]/);
     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
 
-    if (!Array.isArray(parsed)) {
+    if (!Array.isArray(parsed) || parsed.length !== expectedLength) {
       return null;
     }
 
-    return Array.from({ length: expectedLength }, (_, index) =>
-      normalizeCategory(parsed[index]),
-    );
+    return parsed.map((category) => normalizeCategory(category));
   } catch (error) {
     console.error("AI category parse failed:", error.message);
     return null;
@@ -96,7 +102,7 @@ async function categorizeBatch(batch, apiKey) {
         },
       );
 
-      console.log("OpenRouter response:", response.data);
+      console.log("OpenRouter response received.");
 
       const text = response.data?.choices?.[0]?.message?.content || "";
       const categories = parseAICategories(text, batch.length);
@@ -117,13 +123,16 @@ async function categorizeBatch(batch, apiKey) {
 
 async function categorizeWithAI(transactions) {
   const apiKey = process.env.OPENROUTER_API_KEY;
+  const nextTransactions = (transactions || []).map((transaction) => ({
+    ...transaction,
+    category: normalizeCategory(transaction.category),
+  }));
 
   if (!apiKey || apiKey === "your_key_here") {
     console.log("AI categorizer skipped: OPENROUTER_API_KEY is not configured.");
-    return transactions;
+    return nextTransactions;
   }
 
-  const nextTransactions = [...(transactions || [])];
   const candidates = nextTransactions
     .map((transaction, index) => ({ transaction, index }))
     .filter(
@@ -136,24 +145,32 @@ async function categorizeWithAI(transactions) {
     return nextTransactions;
   }
 
-  console.log(`AI categorizer processing ${candidates.length} transactions.`);
+  const batches = chunkArray(candidates, BATCH_SIZE);
+
+  console.log(
+    `AI categorizer processing ${candidates.length} transactions in ${batches.length} batch(es).`,
+  );
 
   try {
-    for (const batch of chunkArray(candidates, BATCH_SIZE)) {
+    for (const [batchNumber, batch] of batches.entries()) {
+      console.log(
+        `AI categorizer batch ${batchNumber + 1}/${batches.length}: ${batch.length} transaction(s).`,
+      );
+
       const categories = await categorizeBatch(
         batch.map(({ transaction }) => transaction),
         apiKey,
       );
 
       if (!categories) {
-        console.log("All AI models failed, using fallback.");
-        return transactions;
+        console.log("AI batch failed, keeping original categories for this batch.");
+        continue;
       }
 
       batch.forEach(({ index }, batchIndex) => {
         nextTransactions[index] = {
           ...nextTransactions[index],
-          category: categories[batchIndex] || "Other",
+          category: normalizeCategory(categories[batchIndex]),
         };
       });
     }
@@ -161,8 +178,8 @@ async function categorizeWithAI(transactions) {
     return nextTransactions;
   } catch (error) {
     console.error("AI categorizer failed:", error.response?.data || error.message);
-    return transactions;
+    return nextTransactions;
   }
 }
 
-module.exports = { categorizeWithAI };
+module.exports = { CATEGORIES, categorizeWithAI, normalizeCategory };

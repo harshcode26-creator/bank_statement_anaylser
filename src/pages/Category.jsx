@@ -1,26 +1,60 @@
 import { useEffect, useMemo, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import CategoryDetails from "../components/category/CategoryDetails.jsx"
 import CategoryOverview from "../components/category/CategoryOverview.jsx"
+import { getUploadById } from "../services/api.js"
 
 export default function Category() {
-  const location = useLocation()
   const navigate = useNavigate()
-  const data = location.state
+  const { id } = useParams()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [loadedId, setLoadedId] = useState(null)
   const [tab, setTab] = useState("overview")
   const activeCategory = null
 
   useEffect(() => {
-    console.log(data)
-  }, [data])
+    if (!id) {
+      navigate("/upload")
+      return undefined
+    }
+
+    let isMounted = true
+
+    getUploadById(id)
+      .then((uploadData) => {
+        if (!isMounted) return
+
+        setData(uploadData)
+        setError("")
+      })
+      .catch((fetchError) => {
+        if (!isMounted) return
+
+        console.error(fetchError)
+        setError("Unable to load category data.")
+        setData(null)
+      })
+      .finally(() => {
+        if (!isMounted) return
+
+        setLoadedId(id)
+        setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [id, navigate])
 
   const categoryEntries = useMemo(() => {
     return Object.entries(data?.categories ?? {})
+      .filter(([, value]) => Number(value ?? 0) > 0)
       .map(([name, value]) => ({
         name,
         value: Number(value ?? 0),
       }))
-      .filter((category) => category.value > 0)
   }, [data])
 
   const changeTab = (tab) => {
@@ -28,17 +62,25 @@ export default function Category() {
   }
 
   const goToCategoryDetails = (categoryName) => {
-    navigate(`/dashboard/category/${encodeURIComponent(categoryName)}`, {
-      state: data,
-    })
+    navigate(`/dashboard/${id}/category/${encodeURIComponent(categoryName)}`)
   }
 
-  if (!data) {
+  const isLoading = loading || loadedId !== id
+
+  if (isLoading) {
+    return (
+      <div className="w-full px-6 py-6 text-slate-400 bg-transparent">
+        Loading category data...
+      </div>
+    )
+  }
+
+  if (error || !data) {
     return (
       <div className="w-full px-6 py-6 text-slate-200 bg-transparent">
         <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
           <h1 className="text-2xl font-semibold text-white">No data available</h1>
-          <p className="text-slate-400 mt-2">Please upload statement.</p>
+          <p className="text-slate-400 mt-2">{error || "Please upload statement."}</p>
         </div>
       </div>
     )
