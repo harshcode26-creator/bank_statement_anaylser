@@ -82,14 +82,14 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-6 py-3 rounded-lg text-sm font-semibold bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:bg-slate-700 disabled:text-slate-400"
+          className="w-full mt-6 py-3 rounded-lg text-sm font-semibold bg-indigo-600 text-white transition-all duration-200 hover:bg-indigo-700 hover:opacity-80 disabled:bg-slate-700 disabled:text-slate-400"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="mt-4 text-sm text-center text-slate-400">
           No account?{" "}
-          <Link to="/signup" className="font-medium text-indigo-300 hover:text-indigo-200">
+          <Link to="/signup" className="font-medium text-indigo-300 transition-all duration-200 hover:text-indigo-200 hover:opacity-80">
             Sign up
           </Link>
         </p>

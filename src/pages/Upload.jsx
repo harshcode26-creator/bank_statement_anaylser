@@ -8,17 +8,14 @@ export default function Upload() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const [files, setFiles] = useState([])
-  const [loading, setLoading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [message, setMessage] = useState("")
 
   const selectFiles = (nextFiles) => {
     if (!nextFiles.length) return
 
     setFiles(nextFiles)
     setIsSuccess(true)
-    setMessage("")
   }
 
   const handleFileChange = (event) => {
@@ -40,23 +37,10 @@ export default function Upload() {
     setIsDragging(false)
   }
 
-  const handleUpload = async () => {
+  const handleUpload = () => {
     if (!files.length) return
 
-    setLoading(true)
-    setMessage("")
-
-    try {
-      const data = await uploadFiles(files)
-
-      console.log(data)
-      navigate(`/dashboard/${data.uploadId}`)
-    } catch (error) {
-      console.error(error)
-      setMessage("Upload failed. Please try again.")
-    } finally {
-      setLoading(false)
-    }
+    navigate("/processing", { state: { files } })
   }
 
   const handleLogout = () => {
@@ -76,7 +60,7 @@ export default function Upload() {
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-lg border border-white/10 bg-slate-800/90 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10 hover:text-white"
+          className="rounded-lg border border-white/10 bg-slate-800/90 px-3 py-2 text-sm font-medium text-slate-200 transition-all duration-200 hover:bg-white/10 hover:text-white hover:opacity-80"
         >
           Logout
         </button>
@@ -129,18 +113,13 @@ export default function Upload() {
           <p className="text-xs text-slate-400 my-2">or</p>
 
           <label
-            className={`inline-block px-4 py-2 rounded-md text-sm transition-all ${
-              loading
-                ? "bg-slate-700 text-slate-400 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
-            }`}
+            className="inline-block px-4 py-2 rounded-md text-sm transition-all duration-200 hover:opacity-80 bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
           >
             Browse Files
             <input
               type="file"
               className="hidden"
               multiple
-              disabled={loading}
               onChange={handleFileChange}
             />
           </label>
@@ -161,20 +140,16 @@ export default function Upload() {
 
         <button
           className={`w-full mt-6 py-3 rounded-lg text-sm font-semibold
-                 transition-all duration-300 active:scale-95 ${
+                 transition-all duration-200 active:scale-95 hover:opacity-80 ${
                    files.length
                      ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30"
                      : "bg-slate-700 text-slate-400 cursor-not-allowed"
                  }`}
-          disabled={!files.length || loading}
+          disabled={!files.length}
           onClick={handleUpload}
         >
-          {loading ? "Processing..." : "Analyze Statement"}
+          Analyze Statement
         </button>
-
-        {message && (
-          <p className="mt-3 text-xs text-center text-green-400">{message}</p>
-        )}
 
         <p className="mt-4 text-xs text-center text-slate-500">
           &#128274; Your data is processed temporarily in memory and discarded.

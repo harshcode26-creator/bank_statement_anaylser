@@ -210,14 +210,29 @@ export default function History() {
             </p>
           </div>
         ) : loading ? (
-          <div className="text-slate-400 text-sm text-center py-16">
-            Loading history...
+          <div className="min-h-[400px] w-full flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-4"></div>
+            <div className="text-slate-400 text-sm font-medium">Loading history...</div>
           </div>
         ) : error ? (
-          <div className="text-red-400 text-sm text-center py-16">{error}</div>
+          <div className="min-h-[400px] w-full flex items-center justify-center p-6">
+            <div className="text-center max-w-md">
+              <div className="text-red-400 mb-4 text-sm font-medium bg-red-400/10 border border-red-400/20 px-4 py-2 rounded-lg">
+                {error}
+              </div>
+            </div>
+          </div>
         ) : uploads.length === 0 ? (
-          <div className="text-slate-400 text-sm text-center py-16">
-            No history yet
+          <div className="min-h-[400px] w-full flex flex-col items-center justify-center p-6 text-center">
+            <div className="text-slate-400 text-sm font-medium">
+              No statements yet. Upload your first file.
+            </div>
+            <button
+              onClick={() => navigate("/upload")}
+              className="mt-6 px-6 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-200 hover:opacity-80"
+            >
+              Upload Now
+            </button>
           </div>
         ) : (
           <div className="space-y-4">
@@ -234,7 +249,7 @@ export default function History() {
                   className="bg-slate-800 border border-white/10 rounded-xl p-5
                    cursor-pointer hover:bg-slate-700/70 hover:border-indigo-400/40
                    hover:shadow-lg hover:shadow-indigo-500/10 hover:scale-[1.01]
-                   transition"
+                   transition-all duration-200"
                 >
                   <div className="flex justify-between items-center">
                     <div>
@@ -268,7 +283,7 @@ export default function History() {
                         type="button"
                         disabled={isActionPending}
                         onClick={(event) => openRenameModal(event, upload)}
-                        className="text-slate-400 hover:text-indigo-300 disabled:opacity-50"
+                        className="text-slate-400 hover:text-indigo-300 disabled:opacity-50 transition-all duration-200 hover:opacity-80"
                       >
                         Rename
                       </button>
@@ -277,7 +292,7 @@ export default function History() {
                         type="button"
                         disabled={isActionPending}
                         onClick={(event) => openDeleteModal(event, upload)}
-                        className="text-slate-400 hover:text-red-300 disabled:opacity-50"
+                        className="text-slate-400 hover:text-red-300 disabled:opacity-50 transition-all duration-200 hover:opacity-80"
                       >
                         Delete
                       </button>
@@ -302,7 +317,7 @@ export default function History() {
               disabled={isActionRunning}
               onClick={closeRenameModal}
               className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300
-               transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+               transition-all duration-200 hover:bg-white/10 hover:text-white hover:opacity-80 disabled:opacity-50"
             >
               Cancel
             </button>
@@ -311,7 +326,7 @@ export default function History() {
               form="rename-statement-form"
               disabled={isActionRunning}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold
-               text-white transition hover:bg-indigo-700 disabled:opacity-50"
+               text-white transition-all duration-200 hover:bg-indigo-700 hover:opacity-80 disabled:opacity-50"
             >
               {isActionRunning ? "Saving..." : "Save"}
             </button>
@@ -329,7 +344,7 @@ export default function History() {
                 setModalError(null);
               }}
               className="mt-2 w-full rounded-lg border border-white/10 bg-slate-800
-               px-3 py-2 text-sm text-white outline-none transition
+               px-3 py-2 text-sm text-white outline-none transition-all duration-200
                placeholder:text-slate-500 focus:border-indigo-400"
               autoFocus
             />
@@ -353,7 +368,7 @@ export default function History() {
               disabled={isActionRunning}
               onClick={closeDeleteModal}
               className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300
-               transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+               transition-all duration-200 hover:bg-white/10 hover:text-white hover:opacity-80 disabled:opacity-50"
             >
               Cancel
             </button>
@@ -362,7 +377,7 @@ export default function History() {
               disabled={isActionRunning}
               onClick={handleDeleteConfirm}
               className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold
-               text-white transition hover:bg-red-700 disabled:opacity-50"
+               text-white transition-all duration-200 hover:bg-red-700 hover:opacity-80 disabled:opacity-50"
             >
               {isActionRunning ? "Deleting..." : "Delete"}
             </button>
