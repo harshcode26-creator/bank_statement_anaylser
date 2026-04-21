@@ -1,0 +1,193 @@
+import { useEffect, useMemo, useState } from "react"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+
+function InsightCard({ label, value }) {
+  return (
+    <div className="rounded-xl bg-slate-800 border border-white/10 p-6">
+      <p className="text-sm text-slate-400">{label}</p>
+      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
+    </div>
+  )
+}
+
+function HighlightedText({ text, query }) {
+  if (!query) return text
+
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const parts = text.split(new RegExp(`(${escapedQuery})`, "gi"))
+
+  return parts.map((part, index) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <span
+        key={`${part}-${index}`}
+        className="bg-purple-100 text-purple-700 px-1 rounded"
+      >
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  )
+}
+
+function getCategoryTitle(name) {
+  if (!name) return "Category"
+
+  try {
+    return decodeURIComponent(name)
+  } catch {
+    return name
+  }
+}
+
+export default function CategoryDetails() {
+  const { name } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const data = location.state
+  const categoryTitle = getCategoryTitle(name)
+  const categoryName = categoryTitle
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const goBack = () => {
+    navigate("/dashboard/category-breakdown", { state: data })
+  }
+
+  const categoryTransactions = useMemo(() => {
+    return (data?.transactions ?? [])
+      .filter(
+        (tx) =>
+          tx.type === "debit" &&
+          tx.category === categoryName,
+      )
+      .map((tx, index) => ({
+        id: `${tx.date ?? "unknown"}-${tx.description ?? "transaction"}-${index}`,
+        description: tx.description ?? "Unknown transaction",
+        date: tx.date ?? "-",
+        bank: tx.bank ?? tx.type ?? "-",
+        amount: Number(tx.amount ?? 0),
+      }))
+  }, [categoryName, data])
+
+  useEffect(() => {
+    console.log(data?.transactions)
+    console.log("Category:", categoryName)
+    console.log("Filtered tx:", categoryTransactions)
+  }, [categoryName, categoryTransactions, data])
+
+  const filteredTransactions = useMemo(() => {
+    const query = searchQuery.toLowerCase()
+
+    return categoryTransactions.filter(
+      (tx) =>
+        tx.description.toLowerCase().includes(query) ||
+        tx.bank.toLowerCase().includes(query),
+    )
+  }, [categoryTransactions, searchQuery])
+
+  const total = useMemo(
+    () => categoryTransactions.reduce((sum, transaction) => sum + transaction.amount, 0),
+    [categoryTransactions],
+  )
+  const transactionCount = categoryTransactions.length
+
+  const highestSpend = useMemo(
+    () => Math.max(...categoryTransactions.map((transaction) => transaction.amount), 0),
+    [categoryTransactions],
+  )
+
+  const avgSpend = useMemo(
+    () => (transactionCount ? total / transactionCount : 0),
+    [total, transactionCount],
+  )
+
+  if (!data) {
+    return (
+      <div className="p-4 sm:p-6">
+        <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
+          <h1 className="text-2xl font-semibold text-white">No data available</h1>
+          <p className="text-slate-400 mt-2">Please upload again.</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex items-start sm:items-center gap-4">
+        <button onClick={goBack}>&larr;</button>
+        <div>
+          <h1 className="text-2xl font-semibold text-white">
+            {categoryTitle}
+          </h1>
+          <p className="text-sm text-slate-400">
+            Spending insights & transactions
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-slate-800 border border-white/10 p-6">
+        <p className="text-sm text-slate-400">Total Spent</p>
+        <h2 className="text-4xl font-bold text-purple-400 mt-2">
+          &#8377;{total.toLocaleString()}
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <InsightCard label="Transactions" value={transactionCount} />
+        <InsightCard
+          label="Highest Spend"
+          value={`\u20B9${highestSpend.toLocaleString()}`}
+        />
+        <InsightCard
+          label="Average Spend"
+          value={`\u20B9${avgSpend.toLocaleString()}`}
+        />
+      </div>
+
+      <div className="rounded-2xl bg-slate-800 border border-white/10">
+        <div className="px-6 py-4 border-b flex justify-between gap-4">
+          <h3 className="text-lg font-semibold text-white">
+            Transactions
+          </h3>
+          <input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search by merchant or bank"
+            className="rounded-full bg-slate-700 px-4 py-2 text-sm text-white"
+          />
+        </div>
+
+        {!filteredTransactions.length ? (
+          <div className="px-6 py-8 text-sm text-slate-400">
+            No transactions found for this category.
+          </div>
+        ) : (
+          filteredTransactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="flex justify-between px-6 py-4 border-t border-white/5"
+            >
+              <div>
+                <p className="font-medium text-white">
+                  <HighlightedText
+                    text={tx.description}
+                    query={searchQuery}
+                  />
+                </p>
+                <p className="text-sm text-slate-400">{tx.date}</p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-sm text-slate-400">{tx.bank}</p>
+                <p className="font-semibold text-white">
+                  &#8377;{tx.amount.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
