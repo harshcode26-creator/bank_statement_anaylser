@@ -15,6 +15,12 @@ const {
 
 const buildPreview = (transactions) => transactions.slice(0, 10);
 
+const withoutUser = (upload) => {
+  const uploadData = upload.toJSON();
+  delete uploadData.user;
+  return uploadData;
+};
+
 const uploadFiles = async (req, res) => {
   try {
     const uploadedFiles = req.files || [];
@@ -62,6 +68,7 @@ const uploadFiles = async (req, res) => {
     const monthly = analytics.monthly;
 
     const uploadDoc = await Upload.create({
+      user: req.user.id,
       title: "Uploaded Statement",
       totalTransactions,
       summary,
@@ -103,11 +110,11 @@ const getUploadById = async (req, res) => {
     const { id } = req.params;
     const upload = await Upload.findById(id);
 
-    if (!upload) {
-      return res.status(404).json({ message: "Upload not found" });
+    if (!upload || !upload.user || upload.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    return res.json(upload);
+    return res.json(withoutUser(upload));
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -115,9 +122,9 @@ const getUploadById = async (req, res) => {
 
 const getAllUploads = async (req, res) => {
   try {
-    const uploads = await Upload.find().sort({ createdAt: -1 });
+    const uploads = await Upload.find({ user: req.user.id }).sort({ createdAt: -1 });
 
-    return res.json(uploads);
+    return res.json(uploads.map(withoutUser));
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -127,6 +134,12 @@ const getTransactions = async (req, res) => {
   try {
     const { id } = req.params;
     const { category } = req.query;
+    const upload = await Upload.findById(id);
+
+    if (!upload || !upload.user || upload.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
     const filter = { uploadId: id };
 
     if (category) {
@@ -147,17 +160,17 @@ const updateUpload = async (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
 
-    const upload = await Upload.findByIdAndUpdate(
-      id,
+    const upload = await Upload.findOneAndUpdate(
+      { _id: id, user: req.user.id },
       { title },
       { new: true, runValidators: true }
     );
 
     if (!upload) {
-      return res.status(404).json({ message: "Upload not found" });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    return res.json(upload);
+    return res.json(withoutUser(upload));
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -166,10 +179,10 @@ const updateUpload = async (req, res) => {
 const deleteUpload = async (req, res) => {
   try {
     const { id } = req.params;
-    const upload = await Upload.findByIdAndDelete(id);
+    const upload = await Upload.findOneAndDelete({ _id: id, user: req.user.id });
 
     if (!upload) {
-      return res.status(404).json({ message: "Upload not found" });
+      return res.status(403).json({ message: "Unauthorized access" });
     }
 
     await Transaction.deleteMany({ uploadId: id });
