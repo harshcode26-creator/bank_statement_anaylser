@@ -76,9 +76,9 @@ export default function History() {
         setError("Unable to load processing history.");
         setUploads([]);
       } finally {
-        if (!isMounted) return;
-
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 

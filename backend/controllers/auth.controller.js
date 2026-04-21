@@ -66,7 +66,7 @@ const login = async (req, res) => {
         email: user.email,
       },
     });
-  } catch (error) {
+  } catch {
     return res.status(500).json({ message: "Login failed" });
   }
 };

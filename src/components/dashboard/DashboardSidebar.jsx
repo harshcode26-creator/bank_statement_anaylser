@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/AuthContext.jsx"
 
 function Icon({ name, size = 18 }) {
   const common = {
@@ -57,6 +58,13 @@ function Icon({ name, size = 18 }) {
         <path d="M12 7v5l4 2" />
       </>
     ),
+    logout: (
+      <>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </>
+    ),
     menu: (
       <>
         <path d="M4 12h16" />
@@ -101,6 +109,7 @@ function DashboardNavItem({ to, icon, label, effectiveOpen, onClick }) {
 
 export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uploadId }) {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
 
   useEffect(() => {
@@ -133,7 +142,15 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uplo
     }
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate("/login", { replace: true })
+  }
+
   const dashboardPath = uploadId ? `/dashboard/${uploadId}` : "/upload"
+  const displayName = user?.name || "User"
+  const displayEmail = user?.email || ""
+  const initial = displayName.trim().charAt(0).toUpperCase() || "U"
 
   return (
     <div
@@ -211,7 +228,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uplo
       <div className="p-4 border-t border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-sm font-semibold">
-            U
+            {initial}
           </div>
 
           <div
@@ -219,10 +236,27 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uplo
               effectiveOpen ? "opacity-100 max-w-[180px]" : "opacity-0 max-w-0"
             }`}
           >
-            <p className="text-sm font-medium text-white">User</p>
-            <p className="text-xs text-gray-400">user@example.com</p>
+            <p className="text-sm font-medium text-white truncate">{displayName}</p>
+            <p className="text-xs text-gray-400 truncate">{displayEmail}</p>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={`mt-4 flex items-center rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white ${
+            effectiveOpen ? "w-full gap-3 justify-start" : "w-full justify-center"
+          }`}
+        >
+          <Icon name="logout" size={18} />
+          <span
+            className={`transition-all duration-300 overflow-hidden ${
+              effectiveOpen ? "opacity-100 w-auto" : "opacity-0 w-0"
+            }`}
+          >
+            Logout
+          </span>
+        </button>
       </div>
     </div>
   )

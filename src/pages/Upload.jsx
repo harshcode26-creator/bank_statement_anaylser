@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { CheckCircleIcon, FileTextIcon } from "../components/upload/UploadIcons.jsx"
+import { useAuth } from "../context/AuthContext.jsx"
 import { uploadFiles } from "../services/api.js"
 
 export default function Upload() {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -57,11 +59,29 @@ export default function Upload() {
     }
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate("/login", { replace: true })
+  }
+
   return (
     <div
       className="min-h-screen w-full flex items-center justify-center px-4
              bg-gradient-to-b from-[#0b1220] to-[#111827]"
     >
+      <div className="absolute right-4 top-4 flex items-center gap-3">
+        <span className="hidden sm:block max-w-[220px] truncate text-sm text-slate-300">
+          {user?.email}
+        </span>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="rounded-lg border border-white/10 bg-slate-800/90 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10 hover:text-white"
+        >
+          Logout
+        </button>
+      </div>
+
       <div
         className="w-full max-w-md rounded-2xl p-8
                bg-slate-800/90 border border-white/10
