@@ -31,6 +31,15 @@ const uploadSchema = new mongoose.Schema({
       expense: Number,
     },
   },
+
+  topMerchants: [
+    {
+      name: String,
+      amount: Number,
+    },
+  ],
+
+  insights: [String],
 });
 
 module.exports = mongoose.model("Upload", uploadSchema);

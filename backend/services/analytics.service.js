@@ -45,10 +45,13 @@ function getMonthKey(date) {
 }
 
 function calculateAnalytics(transactions) {
+  console.log("Transactions received:", (transactions || []).length);
+  
   let income = 0;
   let expense = 0;
   const categories = { ...DEFAULT_CATEGORIES };
   const monthly = {};
+  const merchantMap = {};
 
   for (const transaction of transactions || []) {
     const amount = Number(transaction.amount) || 0;
@@ -60,6 +63,12 @@ function calculateAnalytics(transactions) {
     } else if (transaction.type === "debit") {
       expense += amount;
       categories[category] += amount;
+
+      // Top Merchants logic (EXACT)
+      if (transaction.description) {
+        const key = transaction.description.trim();
+        merchantMap[key] = (merchantMap[key] || 0) + amount;
+      }
     }
 
     if (!monthly[monthKey]) {
@@ -76,6 +85,44 @@ function calculateAnalytics(transactions) {
     }
   }
 
+  // Finalize Top Merchants (EXACT)
+  const topMerchants = Object.entries(merchantMap)
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+
+  console.log("Top Merchants:", topMerchants);
+
+  // Insights logic (SIMPLE)
+  const totalExpense = expense;
+  
+  let topCategory = "Other";
+  const categoryKeys = Object.keys(categories);
+  if (categoryKeys.length > 0) {
+    topCategory = categoryKeys.reduce((a, b) =>
+      categories[a] > categories[b] ? a : b
+    );
+  }
+
+  const foodAmount = categories["Food"] || 0;
+  const foodPercentage = totalExpense
+    ? ((foodAmount / totalExpense) * 100).toFixed(1)
+    : 0;
+
+  const maxTransaction = (transactions || [])
+    .filter(t => t.type === "debit")
+    .sort((a, b) => Number(b.amount) - Number(a.amount))[0];
+
+  const insights = [
+    `You spent the most on ${topCategory}`,
+    `Food accounts for ${foodPercentage}% of your total expenses`,
+    maxTransaction
+      ? `Your highest expense was \u20B9${Number(maxTransaction.amount).toLocaleString("en-IN")} at ${maxTransaction.description}`
+      : "No transactions found"
+  ];
+
+  console.log("Insights:", insights);
+
   return {
     summary: {
       income,
@@ -84,6 +131,8 @@ function calculateAnalytics(transactions) {
     },
     categories,
     monthly,
+    topMerchants,
+    insights,
   };
 }
 
