@@ -14,7 +14,8 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://finnova-4fjbelsm0-harshcode26-creators-projects.vercel.app"
+    "https://finnova-4fjbelsm0-harshcode26-creators-projects.vercel.app",
+    "https://finnova-livid.vercel.app"
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
