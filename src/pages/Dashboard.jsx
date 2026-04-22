@@ -184,7 +184,7 @@ export default function Dashboard() {
           </section>
 
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="bg-slate-800 rounded-2xl p-6 border border-white/5">
+            <div className="bg-slate-800 rounded-xl p-6 border border-white/5">
               <h2 className="text-lg font-semibold text-white mb-6">Top Merchants</h2>
               {!topMerchants.length ? (
                 <div className="text-sm text-slate-400 text-center py-4">
@@ -209,7 +209,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="bg-slate-800 rounded-2xl p-6 border border-white/5">
+            <div className="bg-slate-800 rounded-xl p-6 border border-white/5">
               <h2 className="text-lg font-semibold text-white mb-6">Smart Insights</h2>
               {!insights.length ? (
                 <div className="text-sm text-slate-400 text-center py-4">
@@ -233,7 +233,7 @@ export default function Dashboard() {
           </section>
 
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="bg-slate-800 rounded-2xl p-6 border border-white/5">
+            <div className="bg-slate-800 rounded-xl p-6 border border-white/5">
               <h2 className="text-lg font-semibold text-white mb-6">
                 <button
                   type="button"
@@ -276,7 +276,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="bg-slate-800 rounded-2xl p-6 border border-white/5">
+            <div className="bg-slate-800 rounded-xl p-6 border border-white/5">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-white">
                   Recent Transactions
@@ -337,7 +337,7 @@ export default function Dashboard() {
           </section>
 
           <section
-            className="rounded-2xl border border-white/10 bg-slate-800/60
+            className="rounded-xl border border-white/10 bg-slate-800/60
                backdrop-blur p-5 text-sm text-slate-300"
           >
             <p className="font-medium text-white">Privacy Notice</p>

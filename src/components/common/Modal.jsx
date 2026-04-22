@@ -40,7 +40,7 @@ export default function Modal({
       role="presentation"
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-white/10
+        className="w-full max-w-md rounded-xl border border-white/10
          bg-slate-900 shadow-2xl modal-panel-enter"
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"

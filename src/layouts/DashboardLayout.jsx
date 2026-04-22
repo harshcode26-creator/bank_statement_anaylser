@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import DashboardSidebar from "../components/dashboard/DashboardSidebar.jsx"
+import finnovaLogo from "../assets/finnova-logo.svg"
 
 export default function DashboardLayout({ children }) {
   const { id } = useParams()
@@ -54,9 +55,7 @@ export default function DashboardLayout({ children }) {
             </button>
 
             <div>
-              <p className="text-2xl font-bold text-white">
-                Bank Statement Analyzer
-              </p>
+              <img src={finnovaLogo} alt="Finnova" className="h-8 w-auto mt-1" />
             </div>
           </div>
         </header>

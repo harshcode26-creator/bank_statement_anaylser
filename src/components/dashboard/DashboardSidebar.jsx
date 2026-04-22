@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext.jsx"
+import finnovaLogo from "../../assets/finnova-logo.svg"
 
 function Icon({ name, size = 18 }) {
   const common = {
@@ -167,12 +168,7 @@ export default function DashboardSidebar({ isOpen, onToggle, onCloseMobile, uplo
             effectiveOpen ? "opacity-100 max-w-[180px]" : "opacity-0 max-w-0"
           }`}
         >
-          <span className="text-white font-semibold text-sm block">
-            Bank Statement Analyzer
-          </span>
-          <span className="text-xs text-gray-400 block">
-            Financial Dashboard
-          </span>
+          <img src={finnovaLogo} alt="Finnova" className="h-10 w-auto" />
         </div>
 
         <button

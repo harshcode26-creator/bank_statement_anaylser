@@ -131,7 +131,7 @@ export default function CategoryRow({
 
   return (
     <div
-      className="bg-slate-800 border border-white/10 rounded-2xl p-5
+      className="bg-slate-800 border border-white/10 rounded-xl p-5
            transition cursor-pointer
            hover:bg-slate-700/70 hover:-translate-y-0.5"
       onClick={() => onSelect?.(name)}

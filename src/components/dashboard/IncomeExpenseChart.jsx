@@ -50,7 +50,7 @@ export default function IncomeExpenseChart({ monthly }) {
   }, [])
 
   return (
-    <div className="bg-slate-800 rounded-2xl p-6 border border-white/5">
+    <div className="bg-slate-800 rounded-xl p-6 border border-white/5">
       <h2 className="text-lg font-semibold text-white mb-6">
         Income vs Expenses Overview
       </h2>

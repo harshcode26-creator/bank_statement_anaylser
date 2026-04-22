@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338CA"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C4B5FD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Badge -->
+  <rect x="0" y="0" width="160" height="160" rx="36" ry="36" fill="url(#iconGrad)"/>
+
+  <!-- F stem -->
+  <rect x="54" y="52" width="18" height="76" rx="4" fill="white"/>
+
+  <!-- F top bar -->
+  <rect x="54" y="52" width="60" height="18" rx="4" fill="white"/>
+
+  <!-- F mid bar -->
+  <rect x="54" y="91" width="44" height="16" rx="4" fill="white"/>
+
+  <!-- Arrow head (clean chevron above stem) -->
+  <path d="M63 26 L96 58 L82 58 L82 52 L63 52 L44 52 L44 58 L30 58 Z" fill="url(#arrowGrad)"/>
+
+  <!-- Stem patch to hide seam -->
+  <rect x="54" y="52" width="18" height="8" fill="white"/>
+</svg>

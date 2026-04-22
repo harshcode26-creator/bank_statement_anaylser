@@ -78,7 +78,7 @@ export default function Category() {
   if (error || !data) {
     return (
       <div className="w-full px-6 py-6 text-slate-200 bg-transparent">
-        <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
+        <div className="rounded-xl bg-slate-800 border border-white/10 p-6 text-center">
           <h1 className="text-2xl font-semibold text-white">No data available</h1>
           <p className="text-slate-400 mt-2">{error || "Please upload statement."}</p>
         </div>

@@ -175,7 +175,7 @@ export default function CategoryDetails() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-slate-800 border border-white/10 p-6">
+      <div className="rounded-xl bg-slate-800 border border-white/10 p-6">
         <p className="text-sm text-slate-400">Total Spent</p>
         <h2 className="text-4xl font-bold text-purple-400 mt-2">
           &#8377;{total.toLocaleString()}
@@ -194,7 +194,7 @@ export default function CategoryDetails() {
         />
       </div>
 
-      <div className="rounded-2xl bg-slate-800 border border-white/10">
+      <div className="rounded-xl bg-slate-800 border border-white/10">
         <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center gap-4">
           <h3 className="text-lg font-semibold text-white">
             Transactions

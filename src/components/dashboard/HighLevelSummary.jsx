@@ -75,7 +75,7 @@ export default function HighLevelSummary({
   const dateRange = months.length ? `${months[0]} - ${months[months.length - 1]}` : "-"
 
   return (
-    <div className="bg-slate-800 rounded-2xl p-6 border border-white/5 h-full">
+    <div className="bg-slate-800 rounded-xl p-6 border border-white/5 h-full">
       <h2 className="text-lg font-semibold text-white mb-6">
         High-Level Summary
       </h2>

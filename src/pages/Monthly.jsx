@@ -80,7 +80,7 @@ export default function Monthly() {
   if (error || !stateData) {
     return (
       <div className="min-h-screen px-4 md:px-10 pt-5 md:pt-8 pb-8 text-slate-200 bg-transparent">
-        <div className="rounded-2xl bg-slate-800 border border-white/10 p-6 text-center">
+        <div className="rounded-xl bg-slate-800 border border-white/10 p-6 text-center">
           <h1 className="text-2xl font-semibold text-white">No data available</h1>
           <p className="text-slate-400 mt-2">{error || "Please upload statement."}</p>
         </div>

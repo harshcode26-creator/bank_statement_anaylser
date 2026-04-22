@@ -8,7 +8,7 @@ export default function CategoryOverview({ categoryEntries = [] }) {
   return (
     <div className="flex flex-col items-center space-y-10">
       <div
-        className="w-full max-w-3xl bg-slate-800 rounded-2xl
+        className="w-full max-w-3xl bg-slate-800 rounded-xl
              border border-white/10 p-6"
       >
         <h3 className="text-lg font-semibold text-white mb-6">

@@ -12,7 +12,7 @@ export default function KpiCards({ totals, netCashFlowWithManual }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
       <div
-        className="bg-slate-800 rounded-2xl shadow-sm border border-white/5
+        className="bg-slate-800 rounded-xl shadow-sm border border-white/5
              p-6 flex justify-between items-start"
       >
         <div>
@@ -42,7 +42,7 @@ export default function KpiCards({ totals, netCashFlowWithManual }) {
       </div>
 
       <div
-        className="bg-slate-800 rounded-2xl shadow-sm border border-white/5
+        className="bg-slate-800 rounded-xl shadow-sm border border-white/5
              p-6 flex justify-between items-start"
       >
         <div>
@@ -72,7 +72,7 @@ export default function KpiCards({ totals, netCashFlowWithManual }) {
       </div>
 
       <div
-        className="bg-slate-800 rounded-2xl shadow-sm border border-white/5
+        className="bg-slate-800 rounded-xl shadow-sm border border-white/5
              p-6 flex justify-between items-start"
       >
         <div>
