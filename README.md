@@ -1,4 +1,6 @@
-# 🏦 Bank Statement Analyzer
+# 🏦 Finnova
+
+live link - https://finnova-livid.vercel.app/
 
 A full-stack web application that analyzes bank statements and provides smart financial insights using AI-powered categorization.
 
